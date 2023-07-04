@@ -1,6 +1,6 @@
 # JON-STR 6-30-2023
 
-all: assemble run-qemu
+all: assemble run-qemu-x86_64
 
 assemble:
 	nasm -f bin boot.asm -o boot.bin

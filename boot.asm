@@ -15,8 +15,8 @@ _start:
 
 	call _enable_cursor_16r
 
-	mov cl, 34							; row
-	mov ch, 12							; column
+	mov dl, 34							; row
+	mov dh, 12							; column
 	call _move_cursor_16r
 
 	mov ah, 0x0e						; BIOS print char 	
@@ -26,16 +26,37 @@ _start:
 	lodsb								; Move the character at the address in SI into AL and inc si
 	int 0x10							; BIOS print char
 
-	push ax								; preserve al
+	push ax
+	mov cx, 0x0007						
+	mov dx, 0xA120						; 0x0007 A120 is 500,000 microseconds								; preserve al
 	call _wait_16r
 	pop ax
 
 	cmp al, 0							; check for zero termination
-	jne .next_char						
+	jne .next_char
+
+	mov cx, 0x0007						
+	mov dx, 0xA120						; 0x0007 A120 is 500,000 microseconds
+	call _wait_16r
+
+	call _clear_screen_16r
+
+.init_prompt;
+	mov al, '>'
+	call _print_char_16r
+
+.prompt:
+	call _read_char_16r
+	call _print_char_16r
+	cmp al, 'X'
+	jne .prompt
+
+	call _clear_screen_16r
+	jmp .init_prompt
 
 	jmp $								; hang
 
-	v_string db 'Hello World!',0		; Put our string in memory
+	v_string db 'STRAWBERRY OS 0.0',0		; Put our string in memory
 
 	%include "inc/subs_16r.asm"
 

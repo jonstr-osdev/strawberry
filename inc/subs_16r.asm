@@ -1,14 +1,23 @@
 [BITS 16]
 
+_print_char_16r:						; (args: al is char to print)
+	mov ah, 0x0E
+	int 0x10
+	ret
+
+_read_char_16r:							
+	mov ah, 0x00
+	int 0x16
+	ret									; (return: al is read char)
+
 _set_mode_16r:							; BIOS set vid mode; (args: bl is mode)
  	mov ah, 0x0							; always zero for mode setting
-	mov al, bl							; text mode = 0x03, vga mode = 0x13
 	int 0x10
 	ret
 
 
 _set_text_mode_16r:
-	mov bl, 0x03						; text mode, 80x25 
+	mov al, 0x03						; text mode, 80x25 
 	call _set_mode_16r
 	ret
 
@@ -19,15 +28,13 @@ _clear_screen_16r:
 
 
 _set_vga_mode_16r:
- 	mov bl, 0x13
+ 	mov al, 0x13
 	call _set_mode_16r
 	ret
 
 
-_wait_16r:
+_wait_16r:								; (args: cx:dx is time)
 	mov ah, 0x86						; wait
-	mov cx, 0x0007						; cx:dx is time
-	mov dx, 0xA120						; 0x0007 A120 is 500,000 microseconds
 	int 0x15							; wait interupt
 	ret
 
@@ -40,11 +47,9 @@ _enable_cursor_16r:
 	ret
 
 
-_move_cursor_16r:						; (args: ch is column, cl is row)
+_move_cursor_16r:						; (args: dh is column, dl is row)
 	mov ah, 0x02
 	mov bh, 0x0
-	mov dh, ch
-	mov dl, cl
 	int 0x10
 	ret
 

@@ -107,15 +107,11 @@ _disk_read_test:
 
 	call _disk_read_16r
 
-	pusha
 	mov si, v_disk_loading_string
 	call _print_string_16r
-	popa
 
-	pusha
 	mov al, ' '
 	call _print_char_16r
-	popa
 
 	mov al, [0x9000]
 	call _print_char_16r

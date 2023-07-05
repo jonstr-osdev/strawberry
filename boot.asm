@@ -15,15 +15,6 @@ _start:
 
 	call _clear_screen_16r
 
-	mov si, v_string2
-	call _print_string_16r
-
-	mov cx, 0x0007						
-	mov dx, 0xA120						
-	call _wait_16r
-
-	call _clear_screen_16r
-
 	call _enable_cursor_16r
 
 	mov dl, 30							; row
@@ -61,8 +52,13 @@ _start:
 .prompt:
 	call _read_char_16r
 	call _print_char_16r
+	
 	cmp al, 'V'
 	je _vga_fill_test
+
+	cmp al, 'R'
+	je _disk_read_test
+
 	cmp al, 'X'
 	jne .prompt
 
@@ -71,8 +67,8 @@ _start:
 
 	jmp $								; hang
 
-	v_string db 'STRAWBERRY OS 0.0',0	; Put our string in memory
-	v_string2 db 'TEST STRING',0		; Put our string in memory
+	v_string 					db 'STRAWBERRY OS 0.0', 0	
+	v_disk_loading_string		db 'Reading from disk (Location: 0x9000) : ', 0
 
 
 _vga_fill_test:
@@ -100,6 +96,31 @@ _vga_fill_test:
     call _wait_16r
 
     jmp .loop
+
+
+_disk_read_test:
+	mov al, 0x8							; num of sectors to read
+	
+	mov bx, 0x0
+	mov es, bx
+	mov bx, 0x9000
+
+	call _disk_read_16r
+
+	pusha
+	mov si, v_disk_loading_string
+	call _print_string_16r
+	popa
+
+	pusha
+	mov al, ' '
+	call _print_char_16r
+	popa
+
+	mov al, [0x9000]
+	call _print_char_16r
+	jmp _end
+
 	
 _end:
 	jmp $
@@ -108,3 +129,5 @@ _end:
 
 	times 510-($-$$) db 0				; padding
 	dw 0xAA55							; standard PC boot sig
+
+times 512 db 'X'

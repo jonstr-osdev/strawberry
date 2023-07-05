@@ -14,6 +14,7 @@ _HEX_PREFIX db "0x", 0
 
 ; disk read error messages
 _MSG_DISK_READ_ERROR db "ERROR READING DISK! Status: ", 0
+_MSG_SECTOR_READ_ERROR db "ERROR READING SECTOR(s) FROM DISK!"
 
 
 _print_char_16r:								; (args: al is char to print)
@@ -158,6 +159,8 @@ _move_cursor_16r:								; (args: dh is column, dl is row)
 _disk_read_16r:
 	call _clear_screen_16r
 
+	push ax
+
 	mov ah, 0x2
 	mov cl, 0x2
 	mov ch, 0x0
@@ -166,6 +169,10 @@ _disk_read_16r:
 
 	int 0x13
 	jc .rd16r_disk_error
+
+	pop bx
+	cmp al, bl
+	jne .rd16r_sector_error
 
 	ret
 
@@ -177,6 +184,11 @@ _disk_read_16r:
 	mov bx, 1
 	call _print_hex_byte_16r					; printing status
     jmp $
+
+.rd16r_sector_error:
+	mov si, _MSG_SECTOR_READ_ERROR
+	call _print_string_16r
+	jmp $
 
 
 _reboot_16r:

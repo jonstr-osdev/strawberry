@@ -1,14 +1,40 @@
+; **************************************************************************************
+;
+; JON-STR 7-5-2023
+;  - "lol we wrote our own print string..."
+;
+; **************************************************************************************
+
+
 [BITS 16]
+
 
 _print_char_16r:						; (args: al is char to print)
 	mov ah, 0x0E
 	int 0x10
 	ret
 
+
 _read_char_16r:							
 	mov ah, 0x00
 	int 0x16
 	ret									; (return: al is read char)
+
+
+_print_string_16r:						; (args: si is base addr of string)
+	pusha
+	mov ah, 0x0E						; BIOS print char
+.ps16r_next_char:
+	lodsb								; Move the character at the address in SI into AL and inc si
+	cmp al, 0x0							; check for zero termination
+	je .ps16r_done
+	int 0x10							; BIOS print char
+	jmp .ps16r_next_char
+
+.ps16r_done:
+	popa
+	ret
+
 
 _set_mode_16r:							; BIOS set vid mode; (args: bl is mode)
  	mov ah, 0x0							; always zero for mode setting

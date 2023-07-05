@@ -20,3 +20,6 @@ iso:
 
 clean:
 	rm -f *.bin
+
+fresh:
+	make clean && make all

@@ -39,3 +39,4 @@ run-iso:
 
 clean:
 	rm -rf build
+	rm -rf *.o

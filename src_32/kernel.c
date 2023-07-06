@@ -1,28 +1,38 @@
 #define ROWS 25
 #define COLS 80
 
+extern void __asm_print_char_at(char c, int col, int row);
+extern void __asm_print_char_at_color(char c, int col, int row, char color);
+
+void print_char_at(char c, int col, int row)
+{
+    __asm_print_char_at(c, col, row);
+}
+
+void print_char_at_color(char c, int col, int row, char color)
+{
+    __asm_print_char_at_color(c, col, row, color);
+}
+
 void main()
 {
-    char *mem = (char *) 0xB8000;
+	char color = 0x0;
 
-    int r, c;
-    for(c = 0; c < COLS; c++)
+    int x, y;
+    for(y = 0; y < ROWS; y++)
     {
-        for(r = 0; r < ROWS; r++)
+        for(x = 0; x < COLS; x++)
         {
-            mem[(c + COLS * r) * 2] = 'x';
+            print_char_at_color('*', x, y, color);
+            color++;
+            if(color == 0xFF)
+            {
+                color = 0x0;
+            }
         }
     }
 
-    mem[0] = '-';
-    mem[2] = '-';
-    mem[4] = '-';
-    mem[6] = 'J';
-    mem[8] = 'O';
-    mem[10]= 'N';
-    mem[12]= '-';
-    mem[14]= 'S';
-    mem[16]= 'T';
-    mem[18]= 'R';
-    mem[20]= '!';
+    print_char_at_color('J', 3, 0, 0x17);
+    print_char_at_color('O', 5, 1, 0x17);
+    print_char_at('N', 7, 2); //, 0b00010111);
 }

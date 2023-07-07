@@ -1,5 +1,5 @@
-BOOT			=	multiboot.asm
-KERNEL			=	kernel.c
+BOOT			=	asm/multiboot.asm
+KERNEL			=	c/kernel.c
 ISOFILE			=	build/stros.iso
 ISO_VOLUME_NAME	=	STRAWBERRYOS
 LINKER			=	linker.ld
@@ -18,9 +18,21 @@ build:
 	ld -m elf_i386 -T ${LINKER} -o ${KERNEL_OUT} build/multiboot.o build/kernel.o
 
 
+build: 
+	make clean
+	mkdir -p build
+	nasm -f elf32 ${BOOT} -o build/multiboot.o
+	gcc -m32 -ffreestanding -c ${KERNEL} -o build/kernel.o -ggdb
+	ld -m elf_i386 -T ${LINKER} -o ${KERNEL_OUT} build/multiboot.o build/kernel.o
+
+
 run: 
 	make build 
 	qemu-system-i386 -kernel ${KERNEL_OUT} -monitor stdio
+
+
+run-debug:
+	qemu-system-i386 -kernel ${KERNEL_OUT} -s S &
 
 
 iso: 

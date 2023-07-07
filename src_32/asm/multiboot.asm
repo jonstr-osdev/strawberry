@@ -72,6 +72,7 @@ section .text
         ret
 
     _mb_start:
+
         mov esp, _mb_stack_top                  ; setup stack
         cli                                     ; disable interrupts 
 

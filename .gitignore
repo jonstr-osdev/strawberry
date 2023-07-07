@@ -1,0 +1,5 @@
+*.bin
+*.iso
+*.img
+
+/home/jonstr/Workspace/nasm/strawberry/src_32/build

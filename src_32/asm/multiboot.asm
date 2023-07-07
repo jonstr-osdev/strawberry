@@ -15,6 +15,7 @@ _mb_FLAGS               equ  _mb_ALIGN | _mb_MEMINFO       ; this is the Multibo
 _mb_MAGIC               equ  0x1BADB002                    ; 'magic number' lets bootloader find the header
 _mb_CHECKSUM            equ -(_mb_MAGIC + _mb_FLAGS)       ; checksum of above, to prove we are multiboot
 
+
 __asm_screen_width_tty  equ 80
 
 
@@ -38,14 +39,13 @@ align 16
 section .text
     global _mb_start:function (_mb_start.mb_end - _mb_start)
 
+    ; main lives here
     %include "asm/inc/extern.asm"
 
     _mb_start:
-
         mov esp, _mb_stack_top                  ; setup stack
         cli                                     ; disable interrupts 
 
-        extern main                             ; defined in kernel.c
         call main
     
     .mb_hang:

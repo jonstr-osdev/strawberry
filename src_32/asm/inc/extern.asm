@@ -15,6 +15,17 @@ __asm_screen_width_tty  equ 80
 global __asm_print_char_at
 global __asm_print_char_at_color
 
+global __asm_load_IDT
+global __asm_enable_interrupts
+
+global __asm_keyboard_handler
+
+global __asm_io_port_in
+global __asm_io_port_out
+
+extern main                                     ; defined in kernel.c
+extern handle_keyboard_interrupt                ; defined in kernel.c
+
 
 i_calc_offset:                                  ; (args: esp + 16 is row, esp + 12 is col, 
                                                 ;        stack offsets increased by one word due to
@@ -43,4 +54,36 @@ __asm_print_char_at_color:                      ; offset = col + (row * width)
     mov [edx], al
     mov eax, [esp + 4 + 4 + 4 + 4]              ; eax = color
     mov [edx + 1], al
+    ret
+
+
+__asm_load_IDT: ; try and change single register subs to use a different register and see the effect
+    mov edx, [esp + 4]
+    lidt [edx]
+    ret
+
+
+__asm_enable_interrupts:
+    sti
+    ret
+
+
+__asm_keyboard_handler:
+    pushad
+    cld
+    call handle_keyboard_interrupt
+    popad
+    iretd
+
+
+__asm_io_port_in:
+    mov edx, [esp + 4]
+    in al, dx
+    ret                                             ; whatever is in eax is returned to c?
+
+
+__asm_io_port_out:
+    mov edx, [esp + 4]
+    mov eax, [esp + 4 + 4]
+    out dx, al
     ret

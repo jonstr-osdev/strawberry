@@ -18,7 +18,7 @@ _mb_CHECKSUM            equ -(_mb_MAGIC + _mb_FLAGS)       ; checksum of above, 
 __asm_screen_width_tty  equ 80
 
 
-; section .note.GNU-stack noalloc noexec nowrite progbits
+section .note.GNU-stack noalloc noexec nowrite progbits
 
 
 section .multiboot
@@ -29,47 +29,16 @@ align 4
 
 
 section .bss
-; align 16
-    _mb_stack_bottom:
-    ; resb 16384
-    resb 8192
+align 16
+    _mb_stack_bottom:                                        ; stack allocation
+    resb 16384
     _mb_stack_top:
 
 
 section .text
-    global _mb_start ;:function (_mb_start.mb_end - _mb_start)
+    global _mb_start:function (_mb_start.mb_end - _mb_start)
 
-    global __asm_print_char_at
-    global __asm_print_char_at_color
-
-    __asm_print_char_at:                            ; offset = col + (row * width)
-        mov eax, [esp + 4 + 4 + 4]            		; eax = row
-        mov edx, 80						            ; 80 (number of cols per row)
-        mul edx								        ; now eax = row * 80
-        add eax, [esp + 4 + 4] 	                    ; now eax = row * 80 + col
-        mov edx, 2						            ; * 2 because 2 bytes per char on screen
-        mul edx
-        mov edx, 0xb8000			                ; vid mem start in edx
-        add edx, eax					            ; Add our calculated offset
-        mov eax, [esp + 4] 		                    ; char c
-        mov [edx], al
-        ret
-        
-
-    __asm_print_char_at_color:                            ; offset = col + (row * width)
-        mov eax, [esp + 4 + 4 + 4]            		; eax = row
-        mov edx, 80						            ; 80 (number of cols per row)
-        mul edx								        ; now eax = row * 80
-        add eax, [esp + 4 + 4] 	                    ; now eax = row * 80 + col
-        mov edx, 2						            ; * 2 because 2 bytes per char on screen
-        mul edx
-        mov edx, 0xb8000			                ; vid mem start in edx
-        add edx, eax					            ; Add our calculated offset
-        mov eax, [esp + 4] 		                    ; char c
-        mov [edx], al
-        mov eax, [esp + 4 + 4 + 4 + 4]              ; eax = color
-        mov [edx + 1], al
-        ret
+    %include "asm/inc/extern.asm"
 
     _mb_start:
 

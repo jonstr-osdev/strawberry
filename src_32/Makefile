@@ -18,7 +18,7 @@ build:
 	ld -m elf_i386 -T ${LINKER} -o ${KERNEL_OUT} build/multiboot.o build/kernel.o
 
 
-build: 
+build-debug: 
 	make clean
 	mkdir -p build
 	nasm -f elf32 ${BOOT} -o build/multiboot.o
@@ -31,8 +31,10 @@ run:
 	qemu-system-i386 -kernel ${KERNEL_OUT} -monitor stdio
 
 
-run-debug:
-	qemu-system-i386 -kernel ${KERNEL_OUT} -s S &
+debug:
+	make build-debug
+	qemu-system-i386 -kernel ${KERNEL_OUT} -s -S &
+	gdb -x .gdbinit
 
 
 iso: 

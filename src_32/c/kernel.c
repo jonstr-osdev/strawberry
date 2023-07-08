@@ -50,7 +50,7 @@ extern void __asm_enable_interrupts();
 
 extern void __asm_keyboard_handler();
 
-extern i8   __asm_io_port_in(u816port);
+extern i8   __asm_io_port_in(u16 port);
 extern void __asm_io_port_out(u16 port, u8 data);
 
 

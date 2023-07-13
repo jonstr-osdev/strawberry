@@ -41,12 +41,14 @@ void TEST_print_char_at_color()
 }
 
 
-void main()
+void main(struct muliboot *mb_boot_ptr)
 {
-    clear_screen();
+    //clear_screen();
 
-    print_string_at("STRAWBERRY OS 0.0 - JON-STR 7-12-2023", 0, 0);
-    print_char_at('>', 0, 1);
+    //print_string_at("STRAWBERRY OS 0.0 - JON-STR 7-12-2023", 0, 0);
+    //print_char_at('>', 0, 1);
+
+    fill_screen('*');
 
     init_IDT();
     init_keyboard();

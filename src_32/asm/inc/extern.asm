@@ -10,6 +10,7 @@
 [BITS 32]
 
 __asm_screen_width_tty  equ 80
+__asm_screen_mem_addr   equ 0xb8000
 
 
 global __asm_print_char_at
@@ -25,6 +26,9 @@ global __asm_io_port_in_w
 
 global __asm_io_port_out_b
 
+global __asm_flush_gdt
+global __asm_flush_idt
+
 extern main                                     ; defined in kernel.c
 extern handle_keyboard_interrupt                ; defined in kernel.c
 
@@ -38,7 +42,7 @@ i_calc_offset:                                  ; (args: esp + 16 is row, esp + 
     add eax, [esp + 4 + 4 + 4]         	        ; now eax = row * 80 + col
     mov edx, 2						            ; * 2 because 2 bytes per char on screen
     mul edx
-    mov edx, 0xb8000			                ; vid mem start in edx
+    mov edx, __asm_screen_mem_addr		        ; vid mem start in edx
     add edx, eax	                            ; vid mem offset in edx
     ret
 
@@ -94,4 +98,12 @@ __asm_io_port_out_b:
     mov edx, [esp + 4]
     mov eax, [esp + 4 + 4]
     out dx, al
+    ret
+
+
+__asm_flush_gdt:    ; not implemented
+    ret
+
+
+__asm_flush_idt:    ; not implemented
     ret

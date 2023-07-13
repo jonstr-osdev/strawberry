@@ -8,6 +8,11 @@
 
 [BITS 32]
 
+global _mb_boot
+
+extern code
+extern bss
+extern end
 
 _mb_ALIGN               equ  1 << 0                        ; align loaded modules on page boundaries
 _mb_MEMINFO             equ  1 << 1                        ; provide memory map
@@ -16,24 +21,29 @@ _mb_MAGIC               equ  0x1BADB002                    ; 'magic number' lets
 _mb_CHECKSUM            equ -(_mb_MAGIC + _mb_FLAGS)       ; checksum of above, to prove we are multiboot
 
 
-__asm_screen_width_tty  equ 80
-
-
 section .note.GNU-stack noalloc noexec nowrite progbits
 
 
 section .multiboot
+_mb_boot:
 align 4
     dd _mb_MAGIC
     dd _mb_FLAGS
     dd _mb_CHECKSUM
 
+    dd _mb_boot
+    dd code
+    dd bss
+    dd end
+    dd _mb_start
 
 section .bss
+__bss_start:
 align 16
-    _mb_stack_bottom:                                        ; stack allocation
+    _mb_stack_bottom:               ; stack allocation
     resb 16384
     _mb_stack_top:
+__bss_end:
 
 
 section .text
@@ -45,16 +55,25 @@ section .text
 
     _mb_start:
         lgdt [gdt_descriptor]
-        jmp CODE_SEG:.setcs       ; Set CS to our 32-bit flat code selector
+        jmp CODE_SEG:.setcs         ; Set CS to our 32-bit flat code selector
         .setcs:
-        mov ax, DATA_SEG          ; Setup the segment registers with our flat data selector
+        mov ax, DATA_SEG            ; Setup the segment registers with our flat data selector
         mov ds, ax
         mov es, ax
         mov fs, ax
         mov gs, ax
         mov ss, ax
-        mov esp, _mb_stack_top    ; set stack pointer
-        cli                       ; Disable interrupts
+        mov esp, _mb_stack_top      ; set stack pointer
+        cli                         ; Disable interrupts
+
+        ; Clear .bss section (zero-initialized globals)
+        mov edi, __bss_start
+        mov ecx, __bss_end - __bss_start
+        xor eax, eax
+        rep stosb
+
+        push ebx                    ; load multiboot header location
+
         call main
     
     .mb_hang:

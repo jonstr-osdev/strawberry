@@ -34,11 +34,16 @@ void print_string_at(char *str, u32 col, u32 row)
     }
 }
 
-void clear_screen()
+void fill_screen(char c)
 {
     int i;
     for(i = 0; i < SCREEN_SIZE; i++)
     {
-        print_char_at(' ', i, 0);
+        print_char_at(c, i, 0);
     }
+}
+
+void clear_screen()
+{
+    fill_screen(' ');
 }

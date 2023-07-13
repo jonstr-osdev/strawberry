@@ -23,6 +23,7 @@ void print_char_at(char c, u32 col, u32 row);
 void print_char_at_color(char c, u32 col, u32 row, char color);
 void print_string_at(char *str, u32 col, u32 row);
 
+void fill_screen(char c);
 void clear_screen();
 
 #endif

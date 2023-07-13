@@ -41,11 +41,20 @@ section .text
 
     ; main lives here
     %include "asm/inc/extern.asm"
+    %include "asm/inc/gdt.asm"
 
     _mb_start:
-        mov esp, _mb_stack_top                  ; setup stack
-        cli                                     ; disable interrupts 
-
+        lgdt [gdt_descriptor]
+        jmp CODE_SEG:.setcs       ; Set CS to our 32-bit flat code selector
+        .setcs:
+        mov ax, DATA_SEG          ; Setup the segment registers with our flat data selector
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+        mov ss, ax
+        mov esp, _mb_stack_top    ; set stack pointer
+        cli                       ; Disable interrupts
         call main
     
     .mb_hang:

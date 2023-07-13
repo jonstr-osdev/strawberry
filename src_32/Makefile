@@ -5,6 +5,18 @@ ISO_VOLUME_NAME	=	STRAWBERRYOS
 LINKER			=	linker.ld
 KERNEL_OUT		=	build/stros.bin
 
+SRC_DIR         = c
+OBJ_DIR         = build
+SRC_FILES       = $(shell find $(SRC_DIR) -name "*.c")
+
+
+jorbis:
+	mkdir -p $(OBJ_DIR)
+	nasm -f elf32 $(BOOT) -o $(OBJ_DIR)/multiboot.o
+	gcc -m32 -ffreestanding -c $(SRC_FILES)
+	mv *.o build
+	ld -m elf_i386 -T $(LINKER) -o $(KERNEL_OUT) build/*.o
+
 
 all: 
 	make build

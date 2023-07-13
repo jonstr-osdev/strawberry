@@ -6,6 +6,9 @@
 /
 *//*************************************************************************************/
 
+#ifndef TYPES_H
+#define TYPES_H
+
 /* TYPES */
 /* UNSIGNED */
 typedef unsigned char       uint8_t;
@@ -34,3 +37,5 @@ typedef long long           int64_t;
 #define   i16   int16_t
 #define   i32   int32_t
 #define   i64   int64_t
+
+#endif

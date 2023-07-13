@@ -20,8 +20,10 @@ global __asm_enable_interrupts
 
 global __asm_keyboard_handler
 
-global __asm_io_port_in
-global __asm_io_port_out
+global __asm_io_port_in_b
+global __asm_io_port_in_w
+
+global __asm_io_port_out_b
 
 extern main                                     ; defined in kernel.c
 extern handle_keyboard_interrupt                ; defined in kernel.c
@@ -76,13 +78,19 @@ __asm_keyboard_handler:
     iretd
 
 
-__asm_io_port_in:
+__asm_io_port_in_b:
     mov edx, [esp + 4]
     in al, dx
     ret                                             ; whatever is in eax is returned to c?
 
 
-__asm_io_port_out:
+__asm_io_port_in_w:
+    mov edx, [esp + 4] ; Load port number from stack
+    in ax, dx          ; Read word from port
+    ret                ; Return (value is in eax)
+
+
+__asm_io_port_out_b:
     mov edx, [esp + 4]
     mov eax, [esp + 4 + 4]
     out dx, al

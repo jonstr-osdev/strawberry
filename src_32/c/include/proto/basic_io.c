@@ -10,6 +10,10 @@
 #include "basic_io.h"
 
 
+extern void __asm_print_char_at(char c, u32 col, u32 row);
+extern void __asm_print_char_at_color(char c, u32 col, u32 row, char color);
+
+
 void print_char_at(char c, u32 col, u32 row)
 {
     __asm_print_char_at(c, col, row);
@@ -27,5 +31,14 @@ void print_string_at(char *str, u32 col, u32 row)
         print_char_at(*str, col, row);
         str++;
         col++;
+    }
+}
+
+void clear_screen()
+{
+    int i;
+    for(i = 0; i < SCREEN_SIZE; i++)
+    {
+        print_char_at(' ', i, 0);
     }
 }

@@ -7,14 +7,11 @@
 *//*************************************************************************************/
 
 
-#include "descriptor_tables.h"
+#ifndef JM_IO_H
+#define JM_IO_H
 
-#include "jm_gdt.h"
-#include "jm_idt.h"
+void putc(char c);
+void puts(char *s);
+void clrscn();
 
-
-void init_descriptor_tables()
-{
-    init_gdt();
-    init_idt();
-}
+#endif //JM_IO_H

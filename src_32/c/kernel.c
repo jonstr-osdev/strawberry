@@ -11,6 +11,7 @@
 
 #include "include/proto/basic_io.h"
 #include "include/proto/sys_io.h"
+#include "include/proto/jm_io.h"
 
 #include "include/keyboard.h"
 
@@ -48,7 +49,10 @@ void main(struct muliboot *mb_boot_ptr)
     //print_string_at("STRAWBERRY OS 0.0 - JON-STR 7-12-2023", 0, 0);
     //print_char_at('>', 0, 1);
 
-    fill_screen('*');
+    //fill_screen('*');
+    clrscn();
+    puts("This is a new Hello, World!");
+
 
     init_IDT();
     init_keyboard();

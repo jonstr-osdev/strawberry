@@ -2,7 +2,7 @@
 ;
 ; JON-STR 7-13-2023
 ;  - "I don't remember things that I do not write down..."
-;  - (x) before useful links are used as citations for Highlights
+;  - (*x) before useful links are used as citations for Highlights
 ;
 ; **************************************************************************************
 
@@ -13,7 +13,7 @@
 
 
 * Highlights *
-- (On calling C from ASM and ASM from C)
+- (On calling C from ASM and ASM from C) (*3)
     2.3. Adding some C code
     Interfacing C code and assembly is dead easy. You just have to know the calling convention used. GCC on x86 uses the __cdecl calling convention:
 
@@ -31,16 +31,7 @@
     call func
     mov [d], eax
     See? nothing to it! So, you can see that in our asm snippet above, that 'push ebx' is actually passing the value of ebx as a parameter to the function main().
-
-    2.3.1. The C code
-    // main.c -- Defines the C-code kernel entry point, calls initialisation routines.
-    // Made for JamesM's tutorials
-
-    int main(struct multiboot *mboot_ptr)
-    {
-        // All our initialisation calls will go in here.
-        return 0xDEADBABA;
-    }
+    
 
 * Environment Helpers *
 - bash aliases

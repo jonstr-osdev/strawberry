@@ -54,6 +54,8 @@ section .text
     %include "asm/inc/gdt.asm"
 
     _mb_start:
+        push ebx                    ; load multiboot header location
+
         lgdt [gdt_descriptor]
         jmp CODE_SEG:.setcs         ; Set CS to our 32-bit flat code selector
         .setcs:
@@ -71,8 +73,6 @@ section .text
         mov ecx, __bss_end - __bss_start
         xor eax, eax
         rep stosb
-
-        push ebx                    ; load multiboot header location
 
         call main
     

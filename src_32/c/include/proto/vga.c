@@ -10,14 +10,18 @@
 #include "vga.h"
 
 #include "sys_io.h"
+#include "../string.h"
+
+#ifndef size_t
+#define size_t uint32_t
+#endif
 
 
 #define COLOR_BLACK  0x0
 #define COLOR_GREEN  0x2
 #define COLOR_PURPLE 0xF
 
-u8 g_320x200x256[] =
-{
+u8 g_320x200x256[] = {
 /* MISC */
 	0x63,
 /* SEQ */
@@ -36,8 +40,7 @@ u8 g_320x200x256[] =
 	0x41, 0x00, 0x0F, 0x00,	0x00
 };
 
-unsigned char g_640x480x16[] =
-{
+unsigned char g_640x480x16[] = {
 /* MISC */
 	0xE3,
 /* SEQ */
@@ -56,19 +59,23 @@ unsigned char g_640x480x16[] =
 	0x01, 0x00, 0x0F, 0x00, 0x00
 };
 
-static void draw_rectangle(int x, int y, int width, int height) {
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
+static void draw_rectangle(int x, int y, int width, int height) 
+{
+	for (int i = 0; i < width; i++) 
+    {
+		for (int j = 0; j < height; j++) 
+        {
 			vga_put_pixel(x+i, y+j, COLOR_GREEN);
 		}
 	}
 }
 
-static void draw_happy_face(int x, int y) {
+static void draw_happy_face(int x, int y) 
+{
 	// eye
-	vga_put_pixel(x,y,COLOR_PURPLE);
+	vga_put_pixel(x, y ,COLOR_PURPLE);
 	// eye
-	vga_put_pixel(x+10,y,COLOR_PURPLE);
+	vga_put_pixel(x+10, y,COLOR_PURPLE);
 	// mouth
 	vga_put_pixel(x,	y+8,COLOR_PURPLE);
 	vga_put_pixel(x+1,	y+9,COLOR_PURPLE);
@@ -80,17 +87,18 @@ static void draw_happy_face(int x, int y) {
 	vga_put_pixel(x+7,	y+10,COLOR_PURPLE);
 	vga_put_pixel(x+8,	y+10,COLOR_PURPLE);
 	vga_put_pixel(x+9,	y+9,COLOR_PURPLE);
-	vga_put_pixel(x+10,y+8,COLOR_PURPLE);
+	vga_put_pixel(x+10, y+8,COLOR_PURPLE);
 }
 
-static void vga_xor()
+static void vga_xor(u16 color_offset)
 {
     int block_size = 4;
+    u16 color = 0 + color_offset;
     for(int x = 0; x < 320; x+=block_size)
     {
+        color = (++color) % 16;
         for(int y = 0; y < 200; y+=block_size)
         {
-            u16 color = (x ^ y) & 0x000F;
             for(int i = 0; i < block_size; i++)
             {
                 vga_put_pixel(x + i, y + i, color);
@@ -99,11 +107,51 @@ static void vga_xor()
     }
 }
 
-void vga_test() {
+u8 back_buffer[320 * 240];
+
+void vga_put_pixel(i32 x, i32 y, u16 color) 
+{
+    u16 offset = x + 320 * y;
+    back_buffer[offset] = color;
+}
+
+void vga_flip() 
+{
+    memcpy((void*)VGA_MEM_ADDR, back_buffer, sizeof(back_buffer));
+}
+
+void vga_clrscn() 
+{
+    for (int i = 0; i < 320; i++) 
+    {
+        for (int j = 0; j < 200; j++) 
+        {
+            vga_put_pixel(i, j, COLOR_BLACK);
+        }
+    }
+    vga_flip();
+}
+
+void dirty_wait()
+{
+    for(u64 i = 0; i < 100; i++);
+}
+
+void vga_test() 
+{
     //println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clrscn();
-    vga_xor();
+    while(true)
+    {
+        for(int color = 0; color < 16; color++)
+        {
+            //vga_clrscn();
+            vga_xor(color);
+            vga_flip();
+            dirty_wait();
+        }
+    }
     /*
 	// draw rectangle
 	draw_rectangle(150, 10, 100, 50);
@@ -123,19 +171,16 @@ void vga_test() {
     */
 }
 
-void vga_clrscn() {
-    for (int i = 0; i < 320; i++) {
-        for (int j = 0; j < 200; j++) {
-            vga_put_pixel(i,j,COLOR_BLACK);
-        }
-    }
-}
 
+
+
+/*
 void vga_put_pixel(i32 x, i32 y, u16 color) {
     u16 offset = x + 320 * y;
     u8 *VGA = (u8*) VGA_MEM_ADDR;
     VGA[offset] = color;
 }
+*/
 
 
 void write_regs(u8 *regs)

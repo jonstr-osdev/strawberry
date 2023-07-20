@@ -12,6 +12,7 @@
 #include "include/proto/basic_io.h"
 #include "include/proto/sys_io.h"
 #include "include/proto/jm_io.h"
+#include "include/proto/vga.h"
 
 #include "include/keyboard.h"
 
@@ -57,6 +58,9 @@ void main(struct muliboot *mb_boot_ptr)
     init_IDT();
     init_keyboard();
     enable_interrupts();
+
+    vga_test();
+
     while(true)
     {
 

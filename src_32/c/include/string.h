@@ -10,9 +10,13 @@
 #ifndef STRING_H
 #define STRING_H
 
+
 #include <stddef.h>
 
 #include "types.h"
+
+
+#define streq(s1, s2) (strcmp((s1), (s2)) == 0)
 
 
 void *memcpy(void *dst, const void *src, size_t n);

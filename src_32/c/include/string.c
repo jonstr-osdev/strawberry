@@ -300,3 +300,23 @@ char* itoa(int num, char* str, int base) {
 
     return str;
 }
+
+int isspace(char c)
+{
+    return (c == ' ' || c == '\t' || c == '\n');
+}
+
+int isdigit(char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+int ishexdigit_lower(char c)
+{
+    return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
+}
+
+int ishexdigit_UPPER(char c)
+{
+    return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'));
+}

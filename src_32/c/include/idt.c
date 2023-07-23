@@ -1,6 +1,6 @@
 /*************************************************************************************//*
 /
-/ JON-STR 7-12-2023
+/ JON-STR 7-13-2023
 /  - "c the world"
 /  
 /
@@ -9,72 +9,110 @@
 
 #include "idt.h"
 
+
+#include "isr.h"
+#include "string.h"
+
 #include "proto/sys_io.h"
 
-#include "keyboard.h"
 
-
-extern void __asm_load_IDT(u32 idt_addr);
-static void load_IDT(u32 idt_addr)
-{
-    __asm_load_IDT(idt_addr);
-}
-
+extern void __asm_flush_idt(u32 gdt_ptr);
 extern void __asm_enable_interrupts();
 
-
-struct IDT_ptr {
-    u16 limit;
-    u32 base;
-} __attribute__((packed));
-
-struct IDT_entry {
-    u16 offset_lower_bits;
-    u16 selector;
-    u8  zero;   //always zero ? (i beleeb so)
-    u8 type_attr;
-    u16 offset_upper_bits;
-} __attribute__((packed));
-
-struct IDT_entry IDT[IDT_SIZE];
-
-void init_IDT()
+static void idt_flush(u32 idt_ptr)
 {
-    u32 offset = (u32) __asm_keyboard_handler;
-    IDT[0x21].offset_lower_bits = offset & 0x0000FFFF;
-    IDT[0x21].selector = KERNEL_CODE_SEGMENT_OFFSET;
-    IDT[0x21].zero = 0;
-    IDT[0x21].type_attr = IDT_INTERRUPT_GATE_32;
-    IDT[0x21].offset_upper_bits = (offset & 0xFFFF0000) >> 16;
+    __asm_flush_idt(idt_ptr);
+}
 
-    //ICW1
-    outb(PIC1_COMMAND_PORT, 0x11);
-    outb(PIC2_COMMAND_PORT, 0x11);
 
-    //ICW2
-    outb(PIC1_DATA_PORT, 0x20);
-    outb(PIC2_DATA_PORT, 0x28);
+idt_entry_t idt_entries[256];
+idt_ptr_t   idt_ptr;
 
-    //ICW3
-    outb(PIC1_DATA_PORT, 0x0);
-    outb(PIC2_DATA_PORT, 0x0);
 
-    //ICW4
-    outb(PIC1_DATA_PORT, 0x1);
-    outb(PIC2_DATA_PORT, 0x1);
+static void idt_set_gate(u8 num, u32 base, u16 sel, u8 flags)
+{
+   idt_entries[num].base_lo = base & 0xFFFF;
+   idt_entries[num].base_hi = (base >> 16) & 0xFFFF;
 
-    //mask interrupts
-    outb(PIC1_DATA_PORT, 0xFF);
-    outb(PIC2_DATA_PORT, 0xFF);
+   idt_entries[num].sel     = sel;
+   idt_entries[num].always0 = 0;
+   // We must uncomment the OR below when we get to using user-mode.
+   // It sets the interrupt gate's privilege level to 3.
+   idt_entries[num].flags   = flags /* | 0x60 */;
+}
 
-    struct IDT_ptr idt_ptr;
-	idt_ptr.limit = (sizeof(struct IDT_entry) * IDT_SIZE) - 1;
-	idt_ptr.base = (unsigned int) &IDT;
-	// Now load this IDT
-	load_IDT((u32) &idt_ptr);
+void init_idt()
+{
+    idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
+    idt_ptr.base  = (u32)&idt_entries;
+
+    memset(idt_entries, 0, sizeof(idt_entry_t)*256);
+
+    // Remap the irq table.
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);
+
+    idt_set_gate( 0, (u32)isr0 , 0x08, 0x8E);
+    idt_set_gate( 1, (u32)isr1 , 0x08, 0x8E);
+    idt_set_gate( 2, (u32)isr2 , 0x08, 0x8E);
+    idt_set_gate( 3, (u32)isr3 , 0x08, 0x8E);
+    idt_set_gate( 4, (u32)isr4 , 0x08, 0x8E);
+    idt_set_gate( 5, (u32)isr5 , 0x08, 0x8E);
+    idt_set_gate( 6, (u32)isr6 , 0x08, 0x8E);
+    idt_set_gate( 7, (u32)isr7 , 0x08, 0x8E);
+    idt_set_gate( 8, (u32)isr8 , 0x08, 0x8E);
+    idt_set_gate( 9, (u32)isr9 , 0x08, 0x8E);
+    idt_set_gate(10, (u32)isr10, 0x08, 0x8E);
+    idt_set_gate(11, (u32)isr11, 0x08, 0x8E);
+    idt_set_gate(12, (u32)isr12, 0x08, 0x8E);
+    idt_set_gate(13, (u32)isr13, 0x08, 0x8E);
+    idt_set_gate(14, (u32)isr14, 0x08, 0x8E);
+    idt_set_gate(15, (u32)isr15, 0x08, 0x8E);
+    idt_set_gate(16, (u32)isr16, 0x08, 0x8E);
+    idt_set_gate(17, (u32)isr17, 0x08, 0x8E);
+    idt_set_gate(18, (u32)isr18, 0x08, 0x8E);
+    idt_set_gate(19, (u32)isr19, 0x08, 0x8E);
+    idt_set_gate(20, (u32)isr20, 0x08, 0x8E);
+    idt_set_gate(21, (u32)isr21, 0x08, 0x8E);
+    idt_set_gate(22, (u32)isr22, 0x08, 0x8E);
+    idt_set_gate(23, (u32)isr23, 0x08, 0x8E);
+    idt_set_gate(24, (u32)isr24, 0x08, 0x8E);
+    idt_set_gate(25, (u32)isr25, 0x08, 0x8E);
+    idt_set_gate(26, (u32)isr26, 0x08, 0x8E);
+    idt_set_gate(27, (u32)isr27, 0x08, 0x8E);
+    idt_set_gate(28, (u32)isr28, 0x08, 0x8E);
+    idt_set_gate(29, (u32)isr29, 0x08, 0x8E);
+    idt_set_gate(30, (u32)isr30, 0x08, 0x8E);
+    idt_set_gate(31, (u32)isr31, 0x08, 0x8E);
+    idt_set_gate(32, (u32)irq0, 0x08, 0x8E);
+    idt_set_gate(33, (u32)irq1, 0x08, 0x8E);
+    idt_set_gate(34, (u32)irq2, 0x08, 0x8E);
+    idt_set_gate(35, (u32)irq3, 0x08, 0x8E);
+    idt_set_gate(36, (u32)irq4, 0x08, 0x8E);
+    idt_set_gate(37, (u32)irq5, 0x08, 0x8E);
+    idt_set_gate(38, (u32)irq6, 0x08, 0x8E);
+    idt_set_gate(39, (u32)irq7, 0x08, 0x8E);
+    idt_set_gate(40, (u32)irq8, 0x08, 0x8E);
+    idt_set_gate(41, (u32)irq9, 0x08, 0x8E);
+    idt_set_gate(42, (u32)irq10, 0x08, 0x8E);
+    idt_set_gate(43, (u32)irq11, 0x08, 0x8E);
+    idt_set_gate(44, (u32)irq12, 0x08, 0x8E);
+    idt_set_gate(45, (u32)irq13, 0x08, 0x8E);
+    idt_set_gate(46, (u32)irq14, 0x08, 0x8E);
+    idt_set_gate(47, (u32)irq15, 0x08, 0x8E);
+
+    idt_flush((u32)&idt_ptr);
 }
 
 void enable_interrupts()
 {
-    __asm_enable_interrupts();
+   __asm_enable_interrupts();
 }

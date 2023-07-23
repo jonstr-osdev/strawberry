@@ -1,20 +1,18 @@
 /*************************************************************************************//*
 /
-/ JON-STR 7-13-2023
+/ JON-STR 7-23-2023
 /  - "c the world"
 /  
 /
 *//*************************************************************************************/
 
 
-#ifndef JM_IO_H
-#define JM_IO_H
+#ifndef MOUSE_H
+#define MOUSE_H
 
-#include "../types.h"
 
-void putc(char c);
-void puts(char *s);
-void clrscn();
-void puti(u32 n);
+void init_mouse();
+void mouse_callback();
+
 
 #endif

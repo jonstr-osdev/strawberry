@@ -6,6 +6,8 @@
 /
 *//*************************************************************************************/
 
+#include "include/descriptor_tables.h"
+
 #include "include/types.h"
 #include "include/macros.h"
 
@@ -15,8 +17,10 @@
 #include "include/proto/vga.h"
 
 #include "include/keyboard.h"
-
 #include "include/idt.h"
+#include "include/timer.h"
+
+//#include "include/idt.h"
 
 
 void TEST_print_char_at_color()
@@ -43,26 +47,26 @@ void TEST_print_char_at_color()
 }
 
 
-void main(struct muliboot *mb_boot_ptr)
+int main(struct muliboot *mb_boot_ptr)
 {
-    //clear_screen();
+    init_descriptor_tables();
 
-    //print_string_at("STRAWBERRY OS 0.0 - JON-STR 7-12-2023", 0, 0);
-    //print_char_at('>', 0, 1);
-
-    //fill_screen('*');
     clrscn();
+
     puts("This is a new Hello, World!");
 
+    //INTERRUPT(0x03);
+    //INTERRUPT(0x04);
 
-    init_IDT();
-    init_keyboard();
     enable_interrupts();
+
+    //init_timer(50);
+
+    init_keyboard();
+
+    //init_mouse();
 
     vga_test();
 
-    while(true)
-    {
-
-    }
+    return 0;
 }

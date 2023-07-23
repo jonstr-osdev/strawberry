@@ -16,7 +16,7 @@
     cli                         ; Disable interrupts firstly.
     push byte 0                 ; Push a dummy error code.
     push byte %1                ; Push the interrupt number.
-    jmp isr_common_stub         ; Go to our common handler code.
+    jmp i_isr_common_stub         ; Go to our common handler code.
 %endmacro
 
 ; This macro creates a stub for an ISR which passes it's own
@@ -26,7 +26,7 @@
   isr%1:
     cli                         ; Disable interrupts.
     push byte %1                ; Push the interrupt number
-    jmp isr_common_stub
+    jmp i_isr_common_stub
 %endmacro
 
 ; This macro creates a stub for an IRQ - the first parameter is
@@ -37,7 +37,7 @@
     cli
     push byte 0
     push byte %2
-    jmp irq_common_stub
+    jmp i_irq_common_stub
 %endmacro
         
 ISR_NOERRCODE 0
@@ -95,7 +95,7 @@ extern isr_handler
 ; This is our common ISR stub. It saves the processor state, sets
 ; up for kernel mode segments, calls the C-level fault handler,
 ; and finally restores the stack frame.
-isr_common_stub:
+i_isr_common_stub:
     pusha                    ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
     mov ax, ds               ; Lower 16-bits of eax = ds.
@@ -126,7 +126,7 @@ extern irq_handler
 ; This is our common IRQ stub. It saves the processor state, sets
 ; up for kernel mode segments, calls the C-level fault handler,
 ; and finally restores the stack frame.
-irq_common_stub:
+i_irq_common_stub:
     pusha                    ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
     mov ax, ds               ; Lower 16-bits of eax = ds.

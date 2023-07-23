@@ -21,7 +21,7 @@
 extern u32 __asm_keyboard_handler();
 
 void init_keyboard();
-void handle_keyboard_interrupt();
+void keyboard_callback();
 
 
 #endif

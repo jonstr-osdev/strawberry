@@ -52,6 +52,7 @@ section .text
     ; main lives here
     %include "asm/inc/extern.asm"
     %include "asm/inc/gdt.asm"
+    %include "asm/inc/int.asm"
 
     _mb_start:
         push ebx                    ; load multiboot header location

@@ -7,7 +7,7 @@
 *//*************************************************************************************/
 
 
-#include "jm_gdt.h"
+#include "gdt.h"
 
 // Lets us access our ASM functions from our C code.
 extern void __asm_flush_gdt(u32 gdt_ptr);

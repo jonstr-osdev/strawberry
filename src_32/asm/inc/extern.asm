@@ -30,7 +30,7 @@ global __asm_flush_gdt
 global __asm_flush_idt
 
 extern main                                     ; defined in kernel.c
-extern handle_keyboard_interrupt                ; defined in kernel.c
+extern keyboard_callback                        ; defined in keyboard.h
 
 
 i_calc_offset:                                  ; (args: esp + 16 is row, esp + 12 is col, 
@@ -40,8 +40,9 @@ i_calc_offset:                                  ; (args: esp + 16 is row, esp + 
     mov edx, __asm_screen_width_tty			    ; 80 (number of cols per row)
     mul edx								        ; now eax = row * 80
     add eax, [esp + 4 + 4 + 4]         	        ; now eax = row * 80 + col
-    mov edx, 2						            ; * 2 because 2 bytes per char on screen
-    mul edx
+    ; mov edx, 2						        ; * 2 because 2 bytes per char on screen
+    ; mul edx
+    shl eax, 1                                  ; multiply eax by 2
     mov edx, __asm_screen_mem_addr		        ; vid mem start in edx
     add edx, eax	                            ; vid mem offset in edx
     ret
@@ -77,7 +78,7 @@ __asm_enable_interrupts:
 __asm_keyboard_handler:
     pushad
     cld
-    call handle_keyboard_interrupt
+    call keyboard_callback
     popad
     iretd
 

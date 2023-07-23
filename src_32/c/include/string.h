@@ -38,5 +38,7 @@ size_t strspn(const char *s, const char *accept);
 size_t strcspn(const char *s, const char *reject);
 char *strpbrk(const char *s, const char *accept);
 
+void reverse(char *str, int length);
+char *itoa(int num, char *str, int base);
 
 #endif //STRING_H

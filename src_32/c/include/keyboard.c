@@ -12,15 +12,19 @@
 #include "proto/sys_io.h"
 #include "proto/basic_io.h"
 
+#include "isr.h"
+
 
 static int cursor_pos = 0;
 
 void init_keyboard()
 {
     outb(PIC1_DATA_PORT, 0xFD);
+
+    register_interrupt_handler(IRQ1, &keyboard_callback);
 }
 
-void handle_keyboard_interrupt()
+void keyboard_callback()
 {
     outb(PIC1_COMMAND_PORT, 0x20);
     u8 status = inb(KEYBOARD_STATUS_PORT);
@@ -33,6 +37,9 @@ void handle_keyboard_interrupt()
             return;
         }
 
+        /* changed this code to ferry chars it gets to some sort of
+           shell or wherever control should be
+           ideally in the future, the keyboard doesnt only print to the screen and can do more*/
         print_char_at(keyboard_map[keycode], cursor_pos, 0);
         cursor_pos++;
     }

@@ -38,11 +38,11 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     //init_timer(50);
 
-    vga_test();
+    //vga_test();
     
-    init_keyboard();
-
     init_mouse();
+    //init_keyboard();
+
 
 
     return 0;

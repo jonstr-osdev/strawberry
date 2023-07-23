@@ -2,7 +2,7 @@
 /
 / JON-STR 7-23-2023
 /  - "c the world"
-/  
+/  - source: Free PS/2 Mouse Code: https://forum.osdev.org/viewtopic.php?t=10247
 /
 *//*************************************************************************************/
 
@@ -21,11 +21,13 @@
 #define MOUSE_DATA_PORT 0x60
 #define MOUSE_COMMAND_PORT 0x64
 
+
 // Mouse packet variables
 u8 mouse_cycle=0;
 char mouse_packet[3];
 char mouse_x=0;
 char mouse_y=0;
+
 
 void mouse_wait(u8 type)
 {
@@ -111,41 +113,46 @@ void init_mouse()
 // Handles the mouse interrupt by reading the data from the port and processing it.
 void mouse_callback()
 {
-  static char absolute_x = 0;
-  static char absolute_y = 0;
+    static int absolute_x = 0;
+    static int absolute_y = 0;
 
-  switch(mouse_cycle)
-  {
-    case 0:
-        mouse_packet[0]=inb(MOUSE_DATA_PORT);
-        mouse_cycle++;
-        break;
-    case 1:
-        mouse_packet[1]=inb(MOUSE_DATA_PORT);
-        mouse_cycle++;
-        break;
-    case 2:
-        mouse_packet[2]=inb(MOUSE_DATA_PORT);
-        
-        // The x and y offsets are signed, need to cast to signed char
-        char x_offset = (char)mouse_packet[1];
-        char y_offset = (char)mouse_packet[2];
-        
-        // Update the absolute position of the cursor
-        absolute_x += x_offset;
-        absolute_y -= y_offset;  // Subtract y offset because positive y is up in screen coordinates
-        
-        // Clamp absolute x and y to screen boundaries
-        // Replace VGA_WIDTH and VGA_HEIGHT with your actual screen size
-        if (absolute_x < 0) absolute_x = 0;
-        if (absolute_x >= VGA_SCREEN_WIDTH) absolute_x = VGA_SCREEN_WIDTH - 1;
-        if (absolute_y < 0) absolute_y = 0;
-        if (absolute_y >= VGA_SCREEN_HEIGHT) absolute_y = VGA_SCREEN_HEIGHT - 1;
-        
-        mouse_cycle=0;
-        
-        vga_put_pixel(absolute_x, absolute_y, 16);
-        vga_flip();
+    switch(mouse_cycle)
+    {
+        case 0:
+            mouse_packet[0]=inb(MOUSE_DATA_PORT);
+            mouse_cycle++;
+            break;
+        case 1:
+            mouse_packet[1]=inb(MOUSE_DATA_PORT);
+            mouse_cycle++;
+            break;
+        case 2:
+            mouse_packet[2]=inb(MOUSE_DATA_PORT);
+            
+            // The x and y offsets are signed, need to cast to signed char
+            char x_offset = (char)mouse_packet[1];
+            char y_offset = (char)mouse_packet[2];
+            
+            // Update the absolute position of the cursor
+            absolute_x += x_offset;
+            absolute_y -= y_offset;  // Subtract y offset because positive y is up in screen coordinates
+            
+            // Clamp absolute x and y to screen boundaries
+            // Replace VGA_WIDTH and VGA_HEIGHT with your actual screen size
+            if (absolute_x < 0) absolute_x = 0;
+            if (absolute_x >= VGA_SCREEN_WIDTH) absolute_x = VGA_SCREEN_WIDTH - 1;
+            if (absolute_y < 0) absolute_y = 0;
+            if (absolute_y >= VGA_SCREEN_HEIGHT) absolute_y = VGA_SCREEN_HEIGHT - 1;
+            
+            mouse_cycle=0;
+
+            clrscn();
+            puts("Mouse Moved:  X: ");
+            puti(absolute_x);
+            puts(" , Y: ");
+            puti(absolute_y);
+            putc('\n');
+            
         break;
     }
 }

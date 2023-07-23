@@ -16,5 +16,7 @@
 
 void init_timer(u32 freq);
 
+u32 get_ticks();
+
 
 #endif //TIMER_H

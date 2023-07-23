@@ -11,6 +11,7 @@
 
 #include "sys_io.h"
 #include "string.h"
+#include "timer.h"
 
 #ifndef size_t
 #define size_t uint32_t
@@ -20,6 +21,7 @@
 #define COLOR_BLACK  0x0
 #define COLOR_GREEN  0x2
 #define COLOR_PURPLE 0xF
+#define MAX_COLORS   256
 
 static u8 *VID_MEM_BUF = (u8 *) VGA_MEM_ADDR;
 
@@ -106,9 +108,9 @@ static void vga_xor(u16 color_offset)
     u16 color = 0 + color_offset;
     for(int x = 0; x < VGA_SCREEN_WIDTH; x+=block_size)
     {
-        color = (++color) % 16;
         for(int y = 0; y < VGA_SCREEN_HEIGHT; y+=block_size)
         {
+        	color = (++color) % MAX_COLORS;
             for(int i = 0; i < block_size; i++)
             {
                 vga_put_pixel(x + i, y + i, color);
@@ -119,7 +121,7 @@ static void vga_xor(u16 color_offset)
 
 void vga_put_pixel(i32 x, i32 y, u16 color) 
 {
-    u16 offset = x + 320 * y;
+    u16 offset = x + VGA_SCREEN_WIDTH * y;
     CURRENT[offset] = color;
 }
 
@@ -149,7 +151,16 @@ void vga_filscn(u32 color)
 
 void dirty_wait()
 {
-    for(u64 i = 0; i < 100; i++);
+    for(u64 i = 0; i < 10000000; i++);
+}
+
+void wait(u32 last_time)
+{
+	u32 now = get_ticks();
+	while(now - last_time > 500)
+	{
+		;
+	}
 }
 
 void vga_test() 
@@ -157,16 +168,25 @@ void vga_test()
     //println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clrscn();
-    while(true)
-    {
-        for(int color = 0; color < 16; color++)
-        {
+	for(int j = 0; j < 200; j++)
+	{
+		for(int i = 0; i < 256; i++)
+		{
+			vga_put_pixel(i, j, i);
+		}
+	}
+	vga_flip();
+   // while(true)
+    //{
+		//u32 last_time = get_ticks();
+        //for(int color = 0; color < MAX_COLORS; color++)
+        //{
             //vga_clrscn();
-            vga_xor(color);
-            vga_flip();
-            dirty_wait();
-        }
-    }
+            //vga_xor(color);
+            //vga_flip();
+            //wait(last_time);
+        //}
+    //}
     /*
 	// draw rectangle
 	draw_rectangle(150, 10, 100, 50);
@@ -242,7 +262,10 @@ void write_regs(u8 *regs)
 		outb(VGA_AC_WRITE, *regs);
 		regs++;
 	}
+
+	/// UNCOMMENT TO LOCK PALLETTE TO 16 COLORS
 /* lock 16-color palette and unblank display */
-	(void)inb(VGA_INSTAT_READ);
+	//(void)inb(VGA_INSTAT_READ);
+
 	outb(VGA_AC_INDEX, 0x20);
 }

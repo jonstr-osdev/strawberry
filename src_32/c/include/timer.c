@@ -49,3 +49,8 @@ void init_timer(u32 freq)
     outb(PIT_CHANNEL0_PORT, lowb);
     outb(PIT_CHANNEL0_PORT, highb);
 }
+
+u32 get_ticks()
+{
+    return tick;
+}

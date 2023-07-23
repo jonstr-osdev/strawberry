@@ -22,15 +22,13 @@
 #include "include/timer.h"
 
 
-
 int main(multiboot_info_t *mb_boot_ptr)
 {
     init_descriptor_tables();
 
-    clrscn();
+    //clrscn();
 
-    //puts("This is a new Hello, World!");
-
+    // isr_handler() test
     //INTERRUPT(0x03);
     //INTERRUPT(0x04);
 
@@ -40,6 +38,7 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     vga_test();
     
+    // both do not work at the same time right now
     //init_mouse();
     //init_keyboard();
 

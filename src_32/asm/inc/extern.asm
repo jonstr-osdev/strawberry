@@ -13,6 +13,9 @@ __asm_screen_width_tty  equ 80
 __asm_screen_mem_addr   equ 0xb8000
 
 
+kernel_offset           equ 0x8
+
+
 global __asm_print_char_at
 global __asm_print_char_at_color
 
@@ -64,7 +67,7 @@ __asm_print_char_at_color:                      ; offset = col + (row * width)
     ret
 
 
-__asm_load_IDT: ; try and change single register subs to use a different register and see the effect
+__asm_load_IDT:
     mov edx, [esp + 4]
     lidt [edx]
     ret
@@ -86,7 +89,7 @@ __asm_keyboard_handler:
 __asm_io_port_in_b:
     mov edx, [esp + 4]
     in al, dx
-    ret                                             ; whatever is in eax is returned to c?
+    ret                                            
 
 
 __asm_io_port_in_w:
@@ -112,7 +115,7 @@ __asm_flush_gdt:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    jmp 0x08:.flush   ; 0x08 is the offset to our code segment: Far jump!
+    jmp kernel_offset:.flush   ; 0x08 is the offset to our code segment: Far jump!
 .flush:
     ret
 

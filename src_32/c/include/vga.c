@@ -21,6 +21,16 @@
 #define COLOR_GREEN  0x2
 #define COLOR_PURPLE 0xF
 
+static u8 *VID_MEM_BUF = (u8 *) VGA_MEM_ADDR;
+
+//double buffers
+u8 _sbuffers[2][VGA_SCREEN_SIZE];
+u8 _sback = 0;
+
+#define CURRENT (_sbuffers[_sback])
+#define SWAP() (_sback = 1 - _sback)
+
+
 u8 g_320x200x256[] = {
 /* MISC */
 	0x63,
@@ -94,10 +104,10 @@ static void vga_xor(u16 color_offset)
 {
     int block_size = 4;
     u16 color = 0 + color_offset;
-    for(int x = 0; x < 320; x+=block_size)
+    for(int x = 0; x < VGA_SCREEN_WIDTH; x+=block_size)
     {
         color = (++color) % 16;
-        for(int y = 0; y < 200; y+=block_size)
+        for(int y = 0; y < VGA_SCREEN_HEIGHT; y+=block_size)
         {
             for(int i = 0; i < block_size; i++)
             {
@@ -107,26 +117,31 @@ static void vga_xor(u16 color_offset)
     }
 }
 
-u8 back_buffer[320 * 240];
-
 void vga_put_pixel(i32 x, i32 y, u16 color) 
 {
     u16 offset = x + 320 * y;
-    back_buffer[offset] = color;
+    CURRENT[offset] = color;
 }
 
 void vga_flip() 
 {
-    memcpy((void*)VGA_MEM_ADDR, back_buffer, sizeof(back_buffer));
+    memcpy((void*)VID_MEM_BUF, &CURRENT, VGA_SCREEN_SIZE);
+	SWAP();
 }
+
 
 void vga_clrscn() 
 {
-    for (int i = 0; i < 320; i++) 
+    vga_filscn(COLOR(0, 0, 0));
+}
+
+void vga_filscn(u32 color) 
+{
+    for (int i = 0; i < VGA_SCREEN_WIDTH; i++) 
     {
-        for (int j = 0; j < 200; j++) 
+        for (int j = 0; j < VGA_SCREEN_HEIGHT; j++) 
         {
-            vga_put_pixel(i, j, COLOR_BLACK);
+            vga_put_pixel(i, j, color);
         }
     }
     vga_flip();

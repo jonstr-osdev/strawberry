@@ -19,8 +19,10 @@
 #include "include/idt.h"
 #include "include/timer.h"
 
+#include "include/multiboot_info.h"
 
-int main(struct muliboot *mb_boot_ptr)
+
+int main(multiboot_info_t *mb_boot_ptr)
 {
     init_descriptor_tables();
 

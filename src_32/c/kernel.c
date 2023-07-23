@@ -36,7 +36,7 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     enable_interrupts();
 
-    //init_timer(50);
+    init_timer(50);
 
     //vga_test();
     

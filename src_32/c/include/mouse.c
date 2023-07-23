@@ -15,6 +15,7 @@
 #include "sys_io.h"
 #include "basic_io.h"
 #include "vga.h"
+#include "timer.h"
 
 
 #define MOUSE_IRQ 12
@@ -116,6 +117,8 @@ void mouse_callback()
     static int absolute_x = 0;
     static int absolute_y = 0;
 
+    static u32 secs = 0;
+
     switch(mouse_cycle)
     {
         case 0:
@@ -152,6 +155,12 @@ void mouse_callback()
             puts(" , Y: ");
             puti(absolute_y);
             putc('\n');
+            if(get_ticks() % 50 == 0)
+            {
+                puts("Seconds: ");
+                puti(secs++);
+                putc('\n');
+            }
             
         break;
     }

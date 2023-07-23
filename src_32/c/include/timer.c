@@ -21,20 +21,33 @@
 #define PIT_CHANNEL0_PORT 0x40
 
 
-u32 tick = 0;
+static u32 _ticks = 0;
+static u32 _freq  = 0;
+static u32 _secs  = 0;
 
 
 static void timer_callback(registers_t regs)
 {
-    tick++;
-    puts("Tick: ");
-    puti(tick);
-    puts("\n");
+    _ticks++;
+
+    //puts("Tick: ");
+    //puti(tick);
+    //puts("\n");
+
+
+    /// SECOND COUNTER, SO FRICKEN COOL!
+    // if(tick % _freq == 0)
+    // {
+    //     puts("Seconds: ");
+    //     puti(secs++);
+    //     putc('\n');
+    // }
 }
 
 
 void init_timer(u32 freq)
 {
+    _freq = freq;
     register_interrupt_handler(IRQ0, &timer_callback);
 
     u32 div = PIT_FREQ / freq;
@@ -52,5 +65,5 @@ void init_timer(u32 freq)
 
 u32 get_ticks()
 {
-    return tick;
+    return _ticks;
 }

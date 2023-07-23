@@ -31,6 +31,11 @@
 #define VGA_SEQ_INDEX		0x3C4
 #define VGA_SEQ_DATA		0x3C5
 
+#define VGA_PALETTE_MASK    0x3C6
+#define VGA_PALETTE_READ    0x3C7
+#define VGA_PALETTE_WRITE   0x3C8
+#define VGA_PALETTE_DATA    0x3C9
+
 #define	VGA_NUM_AC_REGS		21
 #define	VGA_NUM_CRTC_REGS	25
 #define	VGA_NUM_GC_REGS		9
@@ -58,6 +63,12 @@
             CLAMP(COLOR_G(_c) + __d, 0, 7),     \
             CLAMP(COLOR_B(_c) + __d, 0, 3)      \
         );})
+
+#define VALUE_TO_COLOR(_value) COLOR(           \
+    (((_value) >> 5) & 0x7),                    \
+    (((_value) >> 2) & 0x7),                    \
+    ((_value) & 0x3))                           
+
 
 extern u8 _sbuffers[2][VGA_SCREEN_SIZE];
 extern u8 _sback;

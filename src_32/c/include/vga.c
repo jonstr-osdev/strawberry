@@ -102,19 +102,14 @@ static void draw_happy_face(int x, int y)
 	vga_put_pixel(x+10, y+8,COLOR_PURPLE);
 }
 
-static void vga_xor(u16 color_offset)
+static void vga_xor()
 {
-    int block_size = 4;
-    u16 color = 0 + color_offset;
-    for(int x = 0; x < VGA_SCREEN_WIDTH; x+=block_size)
+    for(int x = 0; x < VGA_SCREEN_WIDTH; x++)
     {
-        for(int y = 0; y < VGA_SCREEN_HEIGHT; y+=block_size)
+        for(int y = 0; y < VGA_SCREEN_HEIGHT; y++)
         {
-        	color = (++color) % MAX_COLORS;
-            for(int i = 0; i < block_size; i++)
-            {
-                vga_put_pixel(x + i, y + i, color);
-            }
+        	u8 color = VALUE_TO_COLOR(x ^ y);
+			vga_put_pixel(x, y, color);
         }
     }
 }
@@ -168,55 +163,9 @@ void vga_test()
     //println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clrscn();
-	for(int j = 0; j < 200; j++)
-	{
-		for(int i = 0; i < 256; i++)
-		{
-			vga_put_pixel(i, j, i);
-		}
-	}
+	vga_xor();
 	vga_flip();
-   // while(true)
-    //{
-		//u32 last_time = get_ticks();
-        //for(int color = 0; color < MAX_COLORS; color++)
-        //{
-            //vga_clrscn();
-            //vga_xor(color);
-            //vga_flip();
-            //wait(last_time);
-        //}
-    //}
-    /*
-	// draw rectangle
-	draw_rectangle(150, 10, 100, 50);
-	// draw some faces
-	draw_happy_face(10,10);
-	draw_happy_face(100,100);
-	draw_happy_face(300,150);
-	// bounds
-	vga_put_pixel(0, 0, 15);
-	vga_put_pixel(319, 199, COLOR_PURPLE);
-	// see some colors
-	for (int i = 0; i < 15; i++) {
-		for (int j = 0; j < 100; j++) {
-			vga_put_pixel(i, 50+j, i);
-		}
-	}
-    */
 }
-
-
-
-
-/*
-void vga_put_pixel(i32 x, i32 y, u16 color) {
-    u16 offset = x + 320 * y;
-    u8 *VGA = (u8*) VGA_MEM_ADDR;
-    VGA[offset] = color;
-}
-*/
-
 
 void write_regs(u8 *regs)
 {
@@ -263,9 +212,19 @@ void write_regs(u8 *regs)
 		regs++;
 	}
 
-	/// UNCOMMENT TO LOCK PALLETTE TO 16 COLORS
-/* lock 16-color palette and unblank display */
-	//(void)inb(VGA_INSTAT_READ);
-
+/* Configure 256 color pallette */
 	outb(VGA_AC_INDEX, 0x20);
+
+	outb(VGA_PALETTE_MASK, 0xFF);
+    outb(VGA_PALETTE_WRITE, 0);
+    for (u8 i = 0; i < 255; i++) {
+        outb(VGA_PALETTE_DATA, (((i >> 5) & 0x7) * (256 / 8)) / 4);
+        outb(VGA_PALETTE_DATA, (((i >> 2) & 0x7) * (256 / 8)) / 4);
+        outb(VGA_PALETTE_DATA, (((i >> 0) & 0x3) * (256 / 4)) / 4);
+    }
+
+    // set color 255 = white
+    outb(VGA_PALETTE_DATA, 0x3F);
+    outb(VGA_PALETTE_DATA, 0x3F);
+    outb(VGA_PALETTE_DATA, 0x3F);
 }

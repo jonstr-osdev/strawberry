@@ -150,14 +150,18 @@ static const u8 FONT[128][8] = {
 };
 
 
-void font_char(char c, size_t x, size_t y, u8 color) {
+void font_char(char c, size_t x, size_t y, u8 color) 
+{
     assert(c >= 0, "INVALID CHARACTER");
 
     const u8 *glyph = FONT[(size_t) c];
 
-    for (size_t yy = 0; yy < FONT_SIZE; yy++) {
-        for (size_t xx = 0; xx < FONT_SIZE; xx++) {
-            if (glyph[yy] & (1 << xx)) {
+    for (size_t yy = 0; yy < FONT_SIZE; yy++) 
+    {
+        for (size_t xx = 0; xx < FONT_SIZE; xx++) 
+        {
+            if (glyph[yy] & (1 << xx)) 
+            {
                 vga_put_pixel(x + xx, y + yy, color);
             }
         }
@@ -165,35 +169,42 @@ void font_char(char c, size_t x, size_t y, u8 color) {
 }
 
 
-void font_str(const char *s, size_t x, size_t y, u8 color) {
+void font_str(const char *s, size_t x, size_t y, u8 color) 
+{
     char c;
 
-    while ((c = *s++) != 0) {
+    while ((c = *s++) != 0) 
+    {
         font_char(c, x, y, color);
         x += 8;
     }
 }
 
 
-void font_char_scaled(char c, size_t x, size_t y, u8 color, float scale) {
+void font_char_scaled(char c, size_t x, size_t y, u8 color, float scale) 
+{
     assert(c >= 0, "INVALID CHARACTER");
 
     const u8 *glyph = FONT[(size_t) c];
 
     size_t scaled_font_size = (size_t)(scale * FONT_SIZE);
 
-    for (size_t yy = 0; yy < scaled_font_size; yy++) {
-        for (size_t xx = 0; xx < scaled_font_size; xx++) {
+    for (size_t yy = 0; yy < scaled_font_size; yy++) 
+    {
+        for (size_t xx = 0; xx < scaled_font_size; xx++) 
+        {
             size_t original_y = yy / scale;
             size_t original_x = xx / scale;
-            if (glyph[original_y] & (1 << original_x)) {
+            if (glyph[original_y] & (1 << original_x)) 
+            {
                 vga_put_pixel(x + xx, y + yy, color);
             }
         }
     }
 }
 
-void font_str_scaled(const char *s, size_t x, size_t y, u8 color, float scale) {
+void font_str_scaled(const char *s, size_t x, size_t y, u8 color, float scale) 
+{
     char c;
 
     while ((c = *s++) != 0) {

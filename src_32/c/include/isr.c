@@ -10,12 +10,9 @@
 #include "isr.h"
 
 
-#include "sys_io.h"
+#include "system.h"
 #include "basic_io.h"
-
-
-#define PIC1_PORT_A 0x21
-#define PIC2_PORT_A 0xA1
+#include "idt.h"
 
 
 isr_t interrupt_handlers[256];
@@ -67,11 +64,11 @@ void unmask_irq(u8 irq)
 
     if(irq < 8) 
     {
-        port = PIC1_PORT_A;
+        port = PIC1_DATA_PORT;
     } 
     else 
     {
-        port = PIC2_PORT_A;
+        port = PIC2_DATA_PORT;
         irq -= 8;
     }
 

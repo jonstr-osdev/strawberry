@@ -13,6 +13,7 @@
 
 #include "types.h"
 
+#define     KERNEL_CODE_SEGMENT_OFFSET      0x8 // y tho?
 
 #define _assert_0() __error_illegal_macro__
 #define _assert_1(_e) do { if (!(_e)) panic(NULL); } while (0)
@@ -25,8 +26,15 @@
         _assert_1(__VA_ARGS__),\
         _assert_0(__VA_ARGS__))
 
+
+void outb(u16 port, u8 value);
+
+u8  inb(u16 port);
+u16 inw(u16 port);
+
 void panic(const char *err);
 u32 rand();
 void seed(u32 s);
+
 
 #endif

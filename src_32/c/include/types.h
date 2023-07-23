@@ -9,23 +9,27 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+
 /* TYPES */
 /* UNSIGNED */
-typedef unsigned char       uint8_t;
-typedef unsigned short      uint16_t;
-typedef unsigned int        uint32_t;
-typedef unsigned long long  uint64_t;
+// typedef unsigned char       uint8_t;
+// typedef unsigned short      uint16_t;
+// typedef unsigned int        uint32_t;
+// typedef unsigned long long  uint64_t;
 
 /* SIGNED */
-typedef signed char         int8_t;
-typedef short               int16_t;
-typedef int                 int32_t;
-typedef long long           int64_t;
+// typedef signed char         int8_t;
+// typedef short               int16_t;
+// typedef int                 int32_t;
+// typedef long long           int64_t;
 
 /* BOOLEAN */
-#define   bool  unit8_t
-#define   true  1
-#define   false 0
+// #define   bool  unit8_t
+// #define   true  1
+// #define   false 0
 
 /* SHORTHAND */
 #define   u8    uint8_t

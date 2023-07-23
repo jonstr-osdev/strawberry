@@ -9,7 +9,8 @@
 
 #include "basic_io.h"
 
-#include "sys_io.h"
+
+#include "system.h"
 
 
 /* OLD BASIC_IO_H */

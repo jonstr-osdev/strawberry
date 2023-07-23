@@ -12,12 +12,12 @@
 
 #include "isr.h"
 #include "string.h"
-
-#include "sys_io.h"
+#include "system.h"
 
 
 extern void __asm_flush_idt(u32 gdt_ptr);
 extern void __asm_enable_interrupts();
+
 
 static void idt_flush(u32 idt_ptr)
 {
@@ -41,6 +41,7 @@ static void idt_set_gate(u8 num, u32 base, u16 sel, u8 flags)
    idt_entries[num].flags   = flags /* | 0x60 */;
 }
 
+
 void init_idt()
 {
     idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
@@ -49,16 +50,16 @@ void init_idt()
     memset(idt_entries, 0, sizeof(idt_entry_t)*256);
 
     // Remap the irq table.
-    outb(PIC1_COMMAND_PORT, 0x11); // ICW1: initialize command (start the initialization sequence in cascade mode)
-    outb(PIC2_COMMAND_PORT, 0x11); // ICW1: initialize command (start the initialization sequence in cascade mode)
-    outb(PIC1_DATA_PORT, 0x20);    // ICW2: Base address of interrupt vector (IRQ0-IRQ7 -> INT 20h-27h)
-    outb(PIC2_DATA_PORT, 0x28);    // ICW2: Base address of interrupt vector (IRQ8-IRQ15 -> INT 28h-2Fh)
-    outb(PIC1_DATA_PORT, 0x04);    // ICW3: inform PIC1 that there is a slave PIC at IRQ2 (0000 0100)
-    outb(PIC2_DATA_PORT, 0x02);    // ICW3: inform PIC2 it is slave on IRQ2 of master PIC1 (0000 0010)
-    outb(PIC1_DATA_PORT, 0x01);    // ICW4: set x86 mode
-    outb(PIC2_DATA_PORT, 0x01);    // ICW4: set x86 mode
-    outb(PIC1_DATA_PORT, 0x0);     // OCW1: clear mask - enable all IRQs on PIC1
-    outb(PIC2_DATA_PORT, 0x0);     // OCW1: clear mask - enable all IRQs on PIC2
+    outb(PIC1_COMMAND_PORT, 0x11);    // ICW1: initialize command (start the initialization sequence in cascade mode)
+    outb(PIC2_COMMAND_PORT, 0x11);    // ICW1: initialize command (start the initialization sequence in cascade mode)
+    outb(PIC1_DATA_PORT,    0x20);    // ICW2: Base address of interrupt vector (IRQ0-IRQ7 -> INT 20h-27h)
+    outb(PIC2_DATA_PORT,    0x28);    // ICW2: Base address of interrupt vector (IRQ8-IRQ15 -> INT 28h-2Fh)
+    outb(PIC1_DATA_PORT,    0x04);    // ICW3: inform PIC1 that there is a slave PIC at IRQ2 (0000 0100)
+    outb(PIC2_DATA_PORT,    0x02);    // ICW3: inform PIC2 it is slave on IRQ2 of master PIC1 (0000 0010)
+    outb(PIC1_DATA_PORT,    0x01);    // ICW4: set x86 mode
+    outb(PIC2_DATA_PORT,    0x01);    // ICW4: set x86 mode
+    outb(PIC1_DATA_PORT,    0x0);     // OCW1: clear mask - enable all IRQs on PIC1
+    outb(PIC2_DATA_PORT,    0x0);     // OCW1: clear mask - enable all IRQs on PIC2
 
     idt_set_gate( 0, (u32)isr0 , 0x08, 0x8E);
     idt_set_gate( 1, (u32)isr1 , 0x08, 0x8E);
@@ -111,6 +112,7 @@ void init_idt()
 
     idt_flush((u32)&idt_ptr);
 }
+
 
 void enable_interrupts()
 {

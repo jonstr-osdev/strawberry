@@ -12,7 +12,7 @@
 
 #include "isr.h"
 #include "string.h"
-#include "sys_io.h"
+#include "system.h"
 #include "basic_io.h"
 #include "vga.h"
 #include "timer.h"

@@ -13,13 +13,8 @@
 #include "types.h"
 
 
-#ifndef SCREEN_ROWS
-#define SCREEN_ROWS         80
-#endif
-
-#ifndef SCREEN_COLS
-#define SCREEN_COLS         24
-#endif
+#define TXT_SCREEN_ROWS         80
+#define TXT_SCREEN_COLS         24
 
 
 /* OLD BASIC_IO_H */
@@ -32,5 +27,6 @@ void putc(char c);
 void puts(char *s);
 void clrscn();
 void puti(u32 n);
+
 
 #endif

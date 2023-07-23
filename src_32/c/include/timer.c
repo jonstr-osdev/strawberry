@@ -12,7 +12,7 @@
 #include "isr.h"
 
 #include "basic_io.h"
-#include "sys_io.h"
+#include "system.h"
 
 
 #define PIT_FREQ 1193180
@@ -62,6 +62,7 @@ void init_timer(u32 freq)
     outb(PIT_CHANNEL0_PORT, lowb);
     outb(PIT_CHANNEL0_PORT, highb);
 }
+
 
 u32 get_ticks()
 {

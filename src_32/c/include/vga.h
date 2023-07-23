@@ -101,7 +101,5 @@ void vga_clrscn();
 void vga_put_pixel(i32 x, i32 y, u16 color); //i32's maybe be u32s?
 void vga_flip();
 
-void write_regs(unsigned char *regs);
-
 
 #endif // VGA_H

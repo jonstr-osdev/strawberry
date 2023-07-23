@@ -34,8 +34,10 @@
         font_str(__s, __x, __y, __c);\
     } while (0);
 
+
 void font_char(char c, size_t x, size_t y, u8 color);
 void font_str(const char *s, size_t x, size_t y, u8 color);
-
+void font_char_scaled(char c, size_t x, size_t y, u8 color, float scale);
+void font_str_scaled(const char *s, size_t x, size_t y, u8 color, float scale);
 
 #endif

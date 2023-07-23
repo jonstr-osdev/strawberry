@@ -9,10 +9,11 @@
 #include "keyboard.h"
 #include "keyboard_map.h"
 
-#include "sys_io.h"
 #include "basic_io.h"
 
+#include "system.h"
 #include "isr.h"
+#include "idt.h"
 
 
 static int cursor_pos = 0;

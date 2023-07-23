@@ -9,18 +9,18 @@
 #include "include/descriptor_tables.h"
 
 #include "include/types.h"
-#include "include/macros.h"
+
+#include "include/system.h"
+#include "include/vga.h"
+#include "include/idt.h"
+#include "include/multiboot_info.h"
 
 #include "include/basic_io.h"
-#include "include/sys_io.h"
-#include "include/vga.h"
 
 #include "include/keyboard.h"
 #include "include/mouse.h"
-#include "include/idt.h"
 #include "include/timer.h"
 
-#include "include/multiboot_info.h"
 
 
 int main(multiboot_info_t *mb_boot_ptr)
@@ -29,7 +29,7 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     clrscn();
 
-    puts("This is a new Hello, World!");
+    //puts("This is a new Hello, World!");
 
     //INTERRUPT(0x03);
     //INTERRUPT(0x04);
@@ -38,12 +38,10 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     init_timer(50);
 
-    //vga_test();
+    vga_test();
     
-    init_mouse();
+    //init_mouse();
     //init_keyboard();
-
-
 
     return 0;
 }

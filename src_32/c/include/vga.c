@@ -9,13 +9,12 @@
 
 #include "vga.h"
 
-#include "sys_io.h"
+#include "system.h"
 #include "string.h"
 #include "timer.h"
+#include "font.h"
 
-#ifndef size_t
-#define size_t uint32_t
-#endif
+#include <stddef.h>
 
 
 #define COLOR_BLACK  0x0
@@ -23,14 +22,15 @@
 #define COLOR_PURPLE 0xF
 #define MAX_COLORS   256
 
-static u8 *VID_MEM_BUF = (u8 *) VGA_MEM_ADDR;
+#define CURRENT (_sbuffers[_sback])
+#define SWAP() (_sback = 1 - _sback)
+
+
+static u8 *VGA_MEM_BUF = (u8 *) VGA_MEM_ADDR;
 
 //double buffers
 u8 _sbuffers[2][VGA_SCREEN_SIZE];
 u8 _sback = 0;
-
-#define CURRENT (_sbuffers[_sback])
-#define SWAP() (_sback = 1 - _sback)
 
 
 u8 g_320x200x256[] = {
@@ -52,7 +52,7 @@ u8 g_320x200x256[] = {
 	0x41, 0x00, 0x0F, 0x00,	0x00
 };
 
-unsigned char g_640x480x16[] = {
+u8 g_640x480x16[] = {
 /* MISC */
 	0xE3,
 /* SEQ */
@@ -71,6 +71,7 @@ unsigned char g_640x480x16[] = {
 	0x01, 0x00, 0x0F, 0x00, 0x00
 };
 
+
 static void draw_rectangle(int x, int y, int width, int height) 
 {
 	for (int i = 0; i < width; i++) 
@@ -81,6 +82,7 @@ static void draw_rectangle(int x, int y, int width, int height)
 		}
 	}
 }
+
 
 static void draw_happy_face(int x, int y) 
 {
@@ -102,6 +104,7 @@ static void draw_happy_face(int x, int y)
 	vga_put_pixel(x+10, y+8,COLOR_PURPLE);
 }
 
+
 static void vga_xor()
 {
     for(int x = 0; x < VGA_SCREEN_WIDTH; x++)
@@ -114,15 +117,17 @@ static void vga_xor()
     }
 }
 
+
 void vga_put_pixel(i32 x, i32 y, u16 color) 
 {
     u16 offset = x + VGA_SCREEN_WIDTH * y;
     CURRENT[offset] = color;
 }
 
+
 void vga_flip() 
 {
-    memcpy((void*)VID_MEM_BUF, &CURRENT, VGA_SCREEN_SIZE);
+    memcpy((void*)VGA_MEM_BUF, &CURRENT, VGA_SCREEN_SIZE);
 	SWAP();
 }
 
@@ -131,6 +136,7 @@ void vga_clrscn()
 {
     vga_filscn(COLOR(0, 0, 0));
 }
+
 
 void vga_filscn(u32 color) 
 {
@@ -144,11 +150,13 @@ void vga_filscn(u32 color)
     vga_flip();
 }
 
+/// REMOVE: TODO
 void dirty_wait()
 {
     for(u64 i = 0; i < 10000000; i++);
 }
 
+/// FIX: TODO
 void wait(u32 last_time)
 {
 	u32 now = get_ticks();
@@ -158,18 +166,10 @@ void wait(u32 last_time)
 	}
 }
 
-void vga_test() 
-{
-    //println("Attempting to switch modes...", 29);
-    write_regs(g_320x200x256);
-    vga_clrscn();
-	//vga_xor();
-	//vga_flip();
-}
 
-void write_regs(u8 *regs)
+static void write_regs(u8 *regs)
 {
-	unsigned i;
+	u32 i;
 
 /* write MISCELLANEOUS reg */
 	outb(VGA_MISC_WRITE, *regs);
@@ -227,4 +227,16 @@ void write_regs(u8 *regs)
     outb(VGA_PALETTE_DATA, 0x3F);
     outb(VGA_PALETTE_DATA, 0x3F);
     outb(VGA_PALETTE_DATA, 0x3F);
+}
+
+
+void vga_test() 
+{
+    //println("Attempting to switch modes...", 29);
+    write_regs(g_320x200x256);
+    vga_clrscn();
+
+	font_str_scaled("THIS IS A TEST!", 15, 15, COLOR(0, 0, 7), 0.75);
+	//vga_xor();
+	vga_flip();
 }

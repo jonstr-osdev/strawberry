@@ -40,7 +40,7 @@ void panic(const char *err) {
     vga_filscn(COLOR(7, 0, 0));
 
     if (err != NULL) {
-        font_str(err, (320 - font_width(err)) / 2, 200 / 2 - 4, COLOR(7, 7, 3));
+        font_str(err, VGA_SCREEN_WIDTH - font_width(err) / 2, VGA_SCREEN_HEIGHT / 2 - 4, COLOR(7, 7, 3));
     }
 
     vga_flip();

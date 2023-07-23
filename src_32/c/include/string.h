@@ -41,4 +41,9 @@ char *strpbrk(const char *s, const char *accept);
 void reverse(char *str, int length);
 char *itoa(int num, char *str, int base);
 
+int isspace(char c);
+int isdigit(char c);
+int ishexdigit_lower(char c);
+int ishexdigit_UPPER(char c);
+
 #endif //STRING_H

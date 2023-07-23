@@ -9,8 +9,8 @@
 
 #include "vga.h"
 
-#include "../sys_io.h"
-#include "../string.h"
+#include "sys_io.h"
+#include "string.h"
 
 #ifndef size_t
 #define size_t uint32_t

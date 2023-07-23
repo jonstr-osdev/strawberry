@@ -11,7 +11,7 @@
 #define VGA_H
 
 
-#include "../types.h"
+#include "types.h"
 
 
 #define VGA_MEM_ADDR    0xA0000

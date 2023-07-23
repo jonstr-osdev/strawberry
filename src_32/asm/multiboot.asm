@@ -57,16 +57,18 @@ section .text
     _mb_start:
         push ebx                    ; load multiboot header location
 
-        lgdt [gdt_descriptor]
-        jmp CODE_SEG:.setcs         ; Set CS to our 32-bit flat code selector
-        .setcs:
-        mov ax, DATA_SEG            ; Setup the segment registers with our flat data selector
-        mov ds, ax
-        mov es, ax
-        mov fs, ax
-        mov gs, ax
-        mov ss, ax
-        mov esp, _mb_stack_top      ; set stack pointer
+        ; we load the GDT in c now
+;        lgdt [gdt_descriptor]
+;        jmp CODE_SEG:.setcs         ; Set CS to our 32-bit flat code selector
+;        .setcs:
+;        mov ax, DATA_SEG            ; Setup the segment registers with our flat data selector
+;        mov ds, ax
+;        mov es, ax
+;        mov fs, ax
+;        mov gs, ax
+;        mov ss, ax
+;        mov esp, _mb_stack_top      ; set stack pointer
+
         cli                         ; Disable interrupts
 
         ; Clear .bss section (zero-initialized globals)

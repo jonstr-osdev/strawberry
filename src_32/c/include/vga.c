@@ -163,8 +163,8 @@ void vga_test()
     //println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clrscn();
-	vga_xor();
-	vga_flip();
+	//vga_xor();
+	//vga_flip();
 }
 
 void write_regs(u8 *regs)

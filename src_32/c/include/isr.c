@@ -14,6 +14,10 @@
 #include "basic_io.h"
 
 
+#define PIC1_PORT_A 0x21
+#define PIC2_PORT_A 0xA1
+
+
 isr_t interrupt_handlers[256];
 
 
@@ -54,4 +58,23 @@ void irq_handler(registers_t regs)
         isr_t handler = interrupt_handlers[regs.int_no];
         handler(regs);
     }
+}
+
+void unmask_irq(u8 irq) 
+{
+    u16 port;
+    u8 value;
+
+    if(irq < 8) 
+    {
+        port = PIC1_PORT_A;
+    } 
+    else 
+    {
+        port = PIC2_PORT_A;
+        irq -= 8;
+    }
+
+    value = inb(port) & ~(1 << irq);
+    outb(port, value);        
 }

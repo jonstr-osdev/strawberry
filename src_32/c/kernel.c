@@ -16,6 +16,7 @@
 #include "include/vga.h"
 
 #include "include/keyboard.h"
+#include "include/mouse.h"
 #include "include/idt.h"
 #include "include/timer.h"
 
@@ -37,11 +38,12 @@ int main(multiboot_info_t *mb_boot_ptr)
 
     //init_timer(50);
 
+    vga_test();
+    
     init_keyboard();
 
-    //init_mouse();
+    init_mouse();
 
-    vga_test();
 
     return 0;
 }

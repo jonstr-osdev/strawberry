@@ -14,6 +14,8 @@
 #include "string.h"
 #include "sys_io.h"
 #include "basic_io.h"
+#include "vga.h"
+
 
 #define MOUSE_IRQ 12
 #define MOUSE_DATA_PORT 0x60
@@ -25,44 +27,125 @@ char mouse_packet[3];
 char mouse_x=0;
 char mouse_y=0;
 
+void mouse_wait(u8 type)
+{
+    u32 time_out = 100000;
+
+    if(type == 0)
+    {
+        while(time_out--)
+        {
+            if((inb(MOUSE_COMMAND_PORT) & 1) == 1)
+            {
+                return;
+            }
+        }
+
+        return;
+    }
+    else
+    {
+        while(time_out--)
+        {
+            if((inb(MOUSE_COMMAND_PORT) & 2) == 0)
+            {
+                return;
+            }
+
+            return;
+        }
+    }
+}
+
+void mouse_write(u8 write) //unsigned char
+{
+    //Wait to be able to send a command
+    mouse_wait(1);
+    //Tell the mouse we are sending a command
+    outb(MOUSE_COMMAND_PORT, 0xD4);
+    //Wait for the final part
+    mouse_wait(1);
+    //Finally write
+    outb(MOUSE_DATA_PORT, write);
+}
+
+u8 mouse_read()
+{
+    //Get's response from mouse
+    mouse_wait(0);
+    return inb(MOUSE_DATA_PORT);
+}
+
 // Initialize the mouse driver
 void init_mouse()
 {
-    outb(PIC1_DATA_PORT, 0xEF);  // enable IRQ12
-    register_interrupt_handler(MOUSE_IRQ, &mouse_callback);
+    u8 status;
+
+    // enable aux device
+    mouse_wait(1);
+    outb(MOUSE_COMMAND_PORT, 0xA8);
     
-    // Perform a series of commands to enable the mouse
-    outb(MOUSE_COMMAND_PORT, 0xA8); // Enable auxiliary device
-    outb(MOUSE_COMMAND_PORT, 0x20); // Command 0x20 sends the command byte to the data port
-    u8 status_byte = (inb(MOUSE_DATA_PORT) | 2); // Enable the IRQ12 by setting the bit 1 of the command byte
-    outb(MOUSE_COMMAND_PORT, 0x60); // Set the command byte
-    outb(MOUSE_DATA_PORT, status_byte);
-    
-    outb(MOUSE_COMMAND_PORT, 0xD4); // D4 will send the next command to the mouse
-    outb(MOUSE_DATA_PORT, 0xF4); // Enable the mouse
+    unmask_irq(IRQ12);
+
+    // enable interrupt
+    mouse_wait(1);
+    outb(MOUSE_COMMAND_PORT, 0x20);
+    mouse_wait(0);
+    status = (inb(MOUSE_DATA_PORT) | 2);
+    mouse_wait(1);
+    outb(MOUSE_COMMAND_PORT, MOUSE_DATA_PORT);
+    mouse_wait(1);
+    outb(MOUSE_DATA_PORT, status);
+
+    // use defaults
+    mouse_write(0xF6);
+    mouse_read();
+
+    //enable device
+    mouse_write(0xF4);
+    mouse_read();
+
+    register_interrupt_handler(IRQ12, mouse_callback);
 }
 
 // Handles the mouse interrupt by reading the data from the port and processing it.
 void mouse_callback()
 {
-    outb(PIC1_COMMAND_PORT, 0x20); // ACK to the PIC
+  static char absolute_x = 0;
+  static char absolute_y = 0;
 
-    mouse_packet[mouse_cycle++] = inb(MOUSE_DATA_PORT);
-
-    if (mouse_cycle == 3) { // if we have all the 3 bytes
-        mouse_cycle = 0; // set the counter to 0
-        mouse_x = mouse_packet[1]; // update mouse_x
-        mouse_y = mouse_packet[2]; // update mouse_y
+  switch(mouse_cycle)
+  {
+    case 0:
+        mouse_packet[0]=inb(MOUSE_DATA_PORT);
+        mouse_cycle++;
+        break;
+    case 1:
+        mouse_packet[1]=inb(MOUSE_DATA_PORT);
+        mouse_cycle++;
+        break;
+    case 2:
+        mouse_packet[2]=inb(MOUSE_DATA_PORT);
         
-         char mouse_x_str[12];
-        char mouse_y_str[12];
-        itoa(mouse_x, mouse_x_str, 10);
-        itoa(mouse_y, mouse_y_str, 10);
-
-        // Print mouse coordinates at the last row of the screen
-        print_string_at("Mouse Position: X=", 0, SCREEN_ROWS - 1);
-        print_string_at(mouse_x_str, 19, SCREEN_ROWS - 1);
-        print_string_at(", Y=", 21 + strlen(mouse_x_str), SCREEN_ROWS - 1);
-        print_string_at(mouse_y_str, 24 + strlen(mouse_x_str), SCREEN_ROWS - 1);
+        // The x and y offsets are signed, need to cast to signed char
+        char x_offset = (char)mouse_packet[1];
+        char y_offset = (char)mouse_packet[2];
+        
+        // Update the absolute position of the cursor
+        absolute_x += x_offset;
+        absolute_y -= y_offset;  // Subtract y offset because positive y is up in screen coordinates
+        
+        // Clamp absolute x and y to screen boundaries
+        // Replace VGA_WIDTH and VGA_HEIGHT with your actual screen size
+        if (absolute_x < 0) absolute_x = 0;
+        if (absolute_x >= VGA_SCREEN_WIDTH) absolute_x = VGA_SCREEN_WIDTH - 1;
+        if (absolute_y < 0) absolute_y = 0;
+        if (absolute_y >= VGA_SCREEN_HEIGHT) absolute_y = VGA_SCREEN_HEIGHT - 1;
+        
+        mouse_cycle=0;
+        
+        vga_put_pixel(absolute_x, absolute_y, 16);
+        vga_flip();
+        break;
     }
 }

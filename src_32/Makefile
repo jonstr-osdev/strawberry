@@ -31,7 +31,7 @@ build-debug:
 
 run: 
 	make build 
-	qemu-system-i386 -kernel ${KERNEL_OUT} -monitor stdio
+	qemu-system-i386 -kernel ${KERNEL_OUT} -monitor stdio -usbdevice tablet
 
 
 debug:

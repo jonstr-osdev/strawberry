@@ -50,6 +50,8 @@ void register_interrupt_handler(u8 n, isr_t handler);
 
 extern isr_t interrupt_handlers[256];
 
+void unmask_irq(u8 irq);
+
 
 extern void isr0 ();
 extern void isr1 ();

@@ -10,8 +10,8 @@
 #include "isr.h"
 
 
-#include "proto/sys_io.h"
-#include "proto/jm_io.h"
+#include "sys_io.h"
+#include "basic_io.h"
 
 
 isr_t interrupt_handlers[256];

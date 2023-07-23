@@ -11,8 +11,8 @@
 
 #include "isr.h"
 
-#include "proto/jm_io.h"
-#include "proto/sys_io.h"
+#include "basic_io.h"
+#include "sys_io.h"
 
 
 #define PIT_FREQ 1193180

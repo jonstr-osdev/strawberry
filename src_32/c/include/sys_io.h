@@ -10,7 +10,7 @@
 #ifndef SYS_IO_H
 #define SYS_IO_H
 
-#include "../types.h"
+#include "types.h"
 
 
 #define     KERNEL_CODE_SEGMENT_OFFSET      0x8 //0x8

@@ -12,8 +12,8 @@
 
 #include "isr.h"
 #include "string.h"
-#include "proto/sys_io.h"
-#include "proto/basic_io.h"
+#include "sys_io.h"
+#include "basic_io.h"
 
 #define MOUSE_IRQ 12
 #define MOUSE_DATA_PORT 0x60

@@ -7,19 +7,36 @@
 *//*************************************************************************************/
 
 
-#include "jm_io.h"
+#include "basic_io.h"
 
 #include "sys_io.h"
 
 
-#ifndef SCREEN_ROWS
-#define SCREEN_ROWS         80
-#endif
+/* OLD BASIC_IO_H */
+extern void __asm_print_char_at(char c, u32 col, u32 row);
+extern void __asm_print_char_at_color(char c, u32 col, u32 row, char color);
 
-#ifndef SCREEN_COLS
-#define SCREEN_COLS         24
-#endif
 
+void print_char_at(char c, u32 col, u32 row)
+{
+    __asm_print_char_at(c, col, row);
+}
+
+void print_char_at_color(char c, u32 col, u32 row, char color)
+{
+    __asm_print_char_at_color(c, col, row, color);
+}
+
+void print_string_at(char *str, u32 col, u32 row)
+{
+    while(*str)
+    {
+        print_char_at(*str, col, row);
+        str++;
+        col++;
+    }
+}
+/* END BASIC_IO_H */
 
 static u8 cursor_x = 0;
 static u8 cursor_y = 0;

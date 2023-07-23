@@ -9,8 +9,8 @@
 #include "keyboard.h"
 #include "keyboard_map.h"
 
-#include "proto/sys_io.h"
-#include "proto/basic_io.h"
+#include "sys_io.h"
+#include "basic_io.h"
 
 #include "isr.h"
 

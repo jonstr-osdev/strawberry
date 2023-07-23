@@ -11,10 +11,9 @@
 #include "include/types.h"
 #include "include/macros.h"
 
-#include "include/proto/basic_io.h"
-#include "include/proto/sys_io.h"
-#include "include/proto/jm_io.h"
-#include "include/proto/vga.h"
+#include "include/basic_io.h"
+#include "include/sys_io.h"
+#include "include/vga.h"
 
 #include "include/keyboard.h"
 #include "include/idt.h"

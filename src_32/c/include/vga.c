@@ -9,7 +9,7 @@
 
 #include "vga.h"
 
-#include "sys_io.h"
+#include "../sys_io.h"
 #include "../string.h"
 
 #ifndef size_t

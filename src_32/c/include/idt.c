@@ -13,7 +13,7 @@
 #include "isr.h"
 #include "string.h"
 
-#include "proto/sys_io.h"
+#include "sys_io.h"
 
 
 extern void __asm_flush_idt(u32 gdt_ptr);
